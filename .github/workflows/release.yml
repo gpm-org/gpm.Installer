@@ -1,0 +1,38 @@
+name: Release
+
+on: 
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    name: release-windows
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.x
+    - name: Restore dependencies
+      run: dotnet restore source/gpm.Installer.sln
+    - name: Build
+      run: dotnet build source/gpm.Installer.sln --no-restore
+      
+    - name: Publish
+      run: dotnet publish source/gpm.Installer.WPF/gpm.Installer.WPF.csproj -o publish-win
+    - uses: montudor/action-zip@v1
+      with:
+        args: zip -qq -r gpm-Installer-wpf.zip publish-win/ 
+
+    - uses: ncipollo/release-action@v1
+      with:
+        draft: true
+        generateReleaseNotes: true
+        artifacts: "*.zip"
+#        bodyFile: "body.md"
+        token: ${{ secrets.GITHUB_TOKEN }}
+
