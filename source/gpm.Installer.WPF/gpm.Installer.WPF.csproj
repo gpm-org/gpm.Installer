@@ -21,7 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\gpm.Core\gpm.Core.csproj" />
+    <ProjectReference Include="..\gpm\source\gpm.core\gpm.core.csproj" />
   </ItemGroup>
+
+
 
 </Project>
