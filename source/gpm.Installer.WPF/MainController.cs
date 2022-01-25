@@ -34,6 +34,8 @@ internal class MainController : ObservableObject
     public bool IsFinished { get => _isFinished; set => SetProperty(ref _isFinished, value); }
 
 
+    public bool IsTesting { get; internal set; }
+
     public bool Restart { get; internal set; }
 
     public string RestartName { get; internal set; } = "";
@@ -45,6 +47,13 @@ internal class MainController : ObservableObject
 
     public async Task<bool> RunAsync()
     {
+        if (IsTesting)
+        {
+            Log.Information("Testing...");
+            return await Test();
+        }
+
+
         _progressService.Report(0);
         // checks
         if (!_libraryService.TryGetValue(Package, out var model))
@@ -79,6 +88,7 @@ internal class MainController : ObservableObject
         if (string.IsNullOrEmpty(RestartName))
         {
             // use first exe in directory
+            // TODO cross platform
             var files = Directory.GetFiles(baseDir, "*.exe");
             exe = files.FirstOrDefault();
 

@@ -8,6 +8,7 @@ internal class Constants
         //public const string Dir = @"/Dir";
         public const string Slot = @"/Slot";
         public const string Package = @"/Package";
+        public const string Test = @"/Test";
     }
 
 }

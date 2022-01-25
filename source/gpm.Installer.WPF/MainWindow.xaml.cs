@@ -20,14 +20,6 @@ public partial class MainWindow : Window
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         var _mainController = Ioc.Default.GetRequiredService<MainController>();
-        //if (!await Task.Run(() => _mainController.Test()))
-        //{
-        //    Log.Warning("Helper installation failed");
-        //}
-        //else
-        //{
-        //    Log.Information("Installation finished succesfully.");
-        //}
 
         if (!await Task.Run(() => _mainController.RunAsync()))
         {

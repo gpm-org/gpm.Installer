@@ -50,8 +50,11 @@ namespace gpm.Installer.WPF
             {
                 var splits = e.Args[i].Split('=');
                 var commandName = splits[0];
-                var commandValue = splits[1];
-
+                var commandValue = "";
+                if (splits.Length > 1)
+                {
+                    commandValue = splits[1];
+                }
 
                 switch (commandName)
                 {
@@ -62,6 +65,9 @@ namespace gpm.Installer.WPF
                     //case Constants.Commands.Dir:
                     //    mainController.BaseDir = commandValue;
                     //    break;
+                    case Constants.Commands.Test:
+                        mainController.IsTesting = true;
+                        break;
                     case Constants.Commands.Package:
                         mainController.Package = commandValue;
                         break;
