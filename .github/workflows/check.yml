@@ -12,7 +12,7 @@ on:
 
 jobs:    
 
-  build-wpf:
+  check-wpf:
 
     runs-on: windows-2022
 
@@ -24,9 +24,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.x
-    - name: Restore dependencies
-      run: dotnet restore source/gpm.Installer.WPF.sln
-    - name: Build
-      run: dotnet build source/gpm.Installer.WPF.sln --no-restore
+      
+    - name: Publish
+      run: dotnet publish source/gpm.Installer.WPF/gpm.Installer.WPF.csproj -o publish-win
+    - run: Compress-Archive -Path publish-win\* -DestinationPath gpm-Installer-wpf.zip
 
    
