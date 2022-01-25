@@ -1,0 +1,3 @@
+[submodule "source/gpm"]
+	path = source/gpm
+	url = https://github.com/gpm-org/gpm
