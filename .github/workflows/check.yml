@@ -12,9 +12,9 @@ on:
 
 jobs:    
 
-  check-wpf:
+  check-installer:
 
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -29,9 +29,25 @@ jobs:
       run: dotnet restore source/gpm.Installer/gpm.Installer.csproj
     - name: Build
       run: dotnet build source/gpm.Installer/gpm.Installer.csproj --no-restore
+
+  check-wpf:
+
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.x
       
     - name: Publish
       run: dotnet publish source/gpm.Installer.WPF/gpm.Installer.WPF.csproj -o publish-win
     - run: Compress-Archive -Path publish-win\* -DestinationPath gpm-Installer-wpf.zip
+    
+
+      
 
    
