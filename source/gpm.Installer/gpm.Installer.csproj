@@ -9,7 +9,7 @@
     <PropertyGroup>
         <Title>gpm.Installer</Title>
         <Authors>Moritz Baron</Authors>
-        <Version>0.2.1</Version>
+        <Version>0.2.2</Version>
         <PackageTags>gpm, GitHub, Installer</PackageTags>
         <PackageOutputPath>./nupkg</PackageOutputPath>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
