@@ -1,21 +1,14 @@
-name: Check
+name: PublishNuget
 
-on:
+on: 
   push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
+    tags:
+    - '*'
 
-jobs:    
-
-  check-wpf:
-
+jobs:
+  build:
+    name: release-wpf
     runs-on: windows-2022
-
     steps:
     - uses: actions/checkout@v2
     - name: Checkout submodules
@@ -24,14 +17,15 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.x
-      
+        
     - name: Restore dependencies
       run: dotnet restore source/gpm.Installer/gpm.Installer.csproj
     - name: Build
       run: dotnet build source/gpm.Installer/gpm.Installer.csproj --no-restore
       
-    - name: Publish
-      run: dotnet publish source/gpm.Installer.WPF/gpm.Installer.WPF.csproj -o publish-win
-    - run: Compress-Archive -Path publish-win\* -DestinationPath gpm-Installer-wpf.zip
-
-   
+    - name: publish nuget
+      id: publish_nuget
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: source/gpm.Installer/gpm.Installer.csproj
+        NUGET_KEY: ${{secrets.NUGET_KEY}}
