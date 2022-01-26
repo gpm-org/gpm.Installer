@@ -40,10 +40,10 @@ public class MainViewModel : ObservableRecipient
         // INSTALLER INIT
         _installer
            .UseWPF()
-           .AddLockFile()
+           .WithLockFile()
            //.AddVersion("8.4.2")
-           .AddChannel("Nightly", "wolvenkit/wolvenkit/test1")
-           .AddChannel("Stable", "wolvenkit/wolvenkit/test1")
+           .WithChannel("Nightly", "wolvenkit/wolvenkit/test1")
+           .WithChannel("Stable", "wolvenkit/wolvenkit/test1")
            .UseChannel("Stable")
            .Build();
 
@@ -69,17 +69,13 @@ public class MainViewModel : ObservableRecipient
             return;
         }
 
-        var isUpdateAvailable = release != null;
-        Log.Information($"Is update available: {isUpdateAvailable}");
+        Log.Information($"Is update available: {release != null}");
 
         if (release != null)
         {
             // TODO: ask user
 
-            // Option 1 sequential
-            //await _installer.Update(releases);
 
-            // Option 2 callback
             // 1 API call
             await _installer.Update(release);
         }

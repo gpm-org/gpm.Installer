@@ -101,7 +101,7 @@ public class AutoInstallerService : IAutoInstallerService
 
         // start gpm install command
         // 1 API call
-        _taskService.UpgradeAndRun(GetInstallerId(_framework), $"/Package={_channel?.Package.Id} /Restart /Slot={_slot}");
+        _taskService.UpgradeAndRun(GetInstallerId(_framework), $"/Package={_channel?.Package.Id} /Restart={_restartApp} /Slot={_slot}");
 
 
         // shutdown exe
@@ -165,7 +165,7 @@ public class AutoInstallerService : IAutoInstallerService
     /// Use configuration info from a gpm lockfile
     /// </summary>
     /// <returns></returns>
-    public AutoInstallerService AddLockFile()
+    public AutoInstallerService WithLockFile()
     {
         // read manifest
         if (!TryGetLockFile(out var info))
@@ -179,7 +179,7 @@ public class AutoInstallerService : IAutoInstallerService
         // TODO version
         _installedVersion = info.Packages[0].Version;
 
-        AddChannel("Default", id);
+        WithChannel("Default", id);
 
         return this;
     }
@@ -230,13 +230,26 @@ public class AutoInstallerService : IAutoInstallerService
 
     private string? _installedVersion;
     /// <summary>
-    /// Registers the current app as a specific version.
+    /// Registers the current app as a specific version
     /// Use AddLockFile instead
     /// </summary>
     /// <returns></returns>
-    public AutoInstallerService AddVersion(string version)
+    public AutoInstallerService WithVersion(string version)
     {
         _installedVersion = version;
+
+        return this;
+    }
+
+    private string _restartApp = "";
+    /// <summary>
+    /// Specify a file to restart
+    /// Use AddLockFile instead
+    /// </summary>
+    /// <returns></returns>
+    public AutoInstallerService WithRestart(string path)
+    {
+        _restartApp = path;
 
         return this;
     }
@@ -249,7 +262,7 @@ public class AutoInstallerService : IAutoInstallerService
     /// <param name="channelName">the name to use for the channel</param>
     /// <param name="id">the gpm id for the app</param>
     /// <returns></returns>
-    public AutoInstallerService AddChannel(string channelName, string id)
+    public AutoInstallerService WithChannel(string channelName, string id)
     {
         // remove duplicate channels for manual register
         var remove = _channels.Where(x => x.Value.Package.Id == id).ToList();
@@ -329,6 +342,7 @@ public class AutoInstallerService : IAutoInstallerService
 
         // register app in gpm if not already
         _slot = _libraryService.RegisterInSlot(package, AppContext.BaseDirectory, _installedVersion);
+        _libraryService.Save();
 
         IsEnabled = true;
         Log.Information("[{_package}, v.{_version}] auto-update Enabled: {IsEnabled}", package, _installedVersion, IsEnabled);

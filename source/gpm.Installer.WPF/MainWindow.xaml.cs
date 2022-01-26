@@ -23,7 +23,7 @@ public partial class MainWindow : Window
 
         if (!await Task.Run(() => _mainController.RunAsync()))
         {
-            Log.Warning("Helper installation failed.");
+            Log.Warning("Installation failed.");
         }
         else
         {

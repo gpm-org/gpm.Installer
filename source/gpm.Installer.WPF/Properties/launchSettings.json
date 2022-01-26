@@ -2,7 +2,7 @@
   "profiles": {
     "gpm.Installer.WPF": {
       "commandName": "Project",
-      "commandLineArgs": "/Test /Restart"
+      "commandLineArgs": "/Restart=WolvenKit.exe /Slot=0 /Package=wolvenkit/wolvenkit-nightly-releases"
     }
   }
 }
