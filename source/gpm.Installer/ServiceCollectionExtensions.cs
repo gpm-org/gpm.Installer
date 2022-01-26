@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddGpmInstaller(this IServiceCollection services)
     {
-        services.AddScoped<IArchiveService, ArchiveService>();
+        services.AddSingleton<IArchiveService, ArchiveService>();
         services.AddSingleton<ILibraryService, LibraryService>();
         services.AddSingleton<IDataBaseService, DataBaseService>();
         services.AddSingleton<IDeploymentService, DeploymentService>();

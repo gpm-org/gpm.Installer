@@ -323,6 +323,7 @@ public class AutoInstallerService : IAutoInstallerService
         if (!result)
         {
             Log.Warning("Helper installation failed.");
+            Log.Information("[{_package}, v.{_version}] auto-update Enabled: {IsEnabled}", package, _installedVersion, IsEnabled);
             return;
         }
 
