@@ -20,8 +20,6 @@ public class AutoInstallerService : IAutoInstallerService
     private readonly ILibraryService _libraryService;
     private readonly ITaskService _taskService;
 
-    private int? _slot;
-
     public AutoInstallerService(
         IGitHubService gitHubService,
         IDataBaseService dataBaseService,
@@ -53,7 +51,7 @@ public class AutoInstallerService : IAutoInstallerService
         }
 
         // 1 API call
-        return await Update(release.NotNull());
+        return await DownloadAndUpdate(release.NotNull());
     }
 
     /// <summary>
@@ -76,11 +74,11 @@ public class AutoInstallerService : IAutoInstallerService
     }
 
     /// <summary>
-    /// Updates the current app to the latest version
+    /// Downloads and updates the current app to the latest version
     /// 1 API call
     /// </summary>
     /// <returns>true if update succeeded</returns>
-    public async Task<bool> Update(ReleaseModel release)
+    public async Task<bool> DownloadAndUpdate(ReleaseModel release)
     {
         if (_channel?.Package is null || !IsEnabled)
         {
@@ -101,7 +99,56 @@ public class AutoInstallerService : IAutoInstallerService
 
         // start gpm install command
         // 1 API call
-        _taskService.UpgradeAndRun(GetInstallerId(_framework), $"/Package={_channel?.Package.Id} /Restart={_restartApp} /Slot={_slot}");
+        await Update();
+
+        // shutdown exe
+        // use a callback here?
+        Environment.Exit(0);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Updates the current app to the latest version
+    /// 1 API call
+    /// </summary>
+    /// <returns>true if update succeeded</returns>
+    public async Task<bool> Update()
+    {
+        if (_channel?.Package == null)
+        {
+            return false;
+        }
+        if (_installedVersion is null)
+        {
+            return false;
+        }
+        if (!IsEnabled)
+        {
+            return false;
+        }
+
+        // register app in gpm if not already
+        var _slot = _libraryService.RegisterInSlot(_channel.Package, AppContext.BaseDirectory, _installedVersion);
+        _libraryService.Save();
+
+        // remove all other channels in slot
+        foreach (var (key, channel) in _channels)
+        {
+            if (channel.Package.Id == _channel.Package.Id)
+            {
+                continue;
+            }
+
+            if (_libraryService.IsInstalledAtLocation(channel.Package.Id, AppContext.BaseDirectory, out var slot))
+            {
+                await _taskService.UpgradeAndRemove(channel.Package.Id, false, "", slot);
+            }
+        }
+
+        // start gpm install command
+        // 1 API call
+        _taskService.UpgradeAndRun(GetInstallerId(_framework), $"/Package={_channel.Package.Id} /Restart={_restartApp} /Slot={_slot}");
 
 
         // shutdown exe
@@ -339,10 +386,6 @@ public class AutoInstallerService : IAutoInstallerService
             Log.Information("[{_package}, v.{_version}] auto-update Enabled: {IsEnabled}", package, _installedVersion, IsEnabled);
             return;
         }
-
-        // register app in gpm if not already
-        _slot = _libraryService.RegisterInSlot(package, AppContext.BaseDirectory, _installedVersion);
-        _libraryService.Save();
 
         IsEnabled = true;
         Log.Information("[{_package}, v.{_version}] auto-update Enabled: {IsEnabled}", package, _installedVersion, IsEnabled);
